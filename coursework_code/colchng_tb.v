@@ -1,5 +1,5 @@
 `default_nettype none
-//`define DUMPSTR(x) `"x.vcd`"
+`define DUMPSTR(x) `"x.vcd`"
 `timescale 100 ns / 10 ns
 
 module colchng_tb();
@@ -24,7 +24,7 @@ initial
 begin
     clk = 1'b0;
     n_rst = 1'b1;
-    btn = 4'b0000;
+    btn = 4'b0001;
     #10 n_rst = 1'b0;
     #10 n_rst = 1'b1;
 
@@ -50,11 +50,12 @@ end
 always @ * begin
     i_vid_hsync = ((hpix_cnt >= 88) && (hpix_cnt <= 131));
     i_vid_vsync = ((vpix_cnt >= 4) && (vpix_cnt <= 8));
-    i_vid_VDE = ((hpix_cnt >= 0) && (hpix_cnt <= 279)) || ((vpix_cnt >= 0) && (vpix_cnt <= 44));
+    i_vid_VDE = ~(((hpix_cnt >= 0) && (hpix_cnt <= 279)) || ((vpix_cnt >= 0) && (vpix_cnt <= 44)));
 end
 
 always #5 clk = !clk;
-
+integer finishedReading = 0;
+integer readCount = 0, writeCount = 0;
 initial begin
     infile = $fopen("pixelsin.txt","r");
     @(posedge n_rst)
@@ -62,22 +63,28 @@ initial begin
         @(posedge clk)
         if(i_vid_VDE) begin
             r = $fscanf(infile,"%d %d %d\n", i_vid_data[23:16], i_vid_data[15:8], i_vid_data[7:0]);
+            readCount= readCount+1;
         end
     end
     $fclose(infile);
-    #10000
-    $finish;
+    finishedReading = 1;
 end
 
+//If there are X's at the start, the last lines are discarded. To fix delay vde, vsync, hsync in 
+//readCount==readCount at the start, so another check is needed inside the loop, otherwise the last line is printed twice
 initial begin
-    //$dumpfile(`DUMPSTR(`VCD_OUTPUT));
-    //$dumpvars(0, colchng_tb);
     outfile = $fopen("pixelsout.txt","w");
-    while (!$feof(outfile)) begin
+    //this was while(!$feof(outfile) but as the file is being written to, it doesn't have an end, so the loop never exits.
+    while (writeCount<=readCount) begin
     @(posedge clk)
-        if(o_vid_VDE) $fwrite(outfile,"%d %d %d\n", o_vid_data[23:16], o_vid_data[15:8], o_vid_data[7:0]);
+        if(o_vid_VDE)begin        
+        if(writeCount<readCount) $fwrite(outfile,"%d %d %d\n", o_vid_data[23:16], o_vid_data[15:8], o_vid_data[7:0]);
+        writeCount = writeCount+1;
+        end
     end
     $fclose(outfile);
+    //only finish when all the lines are written
+    $finish;
 end
 
 endmodule
