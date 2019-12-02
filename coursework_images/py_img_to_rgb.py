@@ -3,6 +3,7 @@ import numpy as np
 from PIL import Image
 
 img = Image.open('H:/Documents/es3f1/es3f1_camera/coursework_images/group_of_people.jpg')
+'''
 arr = np.array(img)
 
 i = 0
@@ -16,6 +17,19 @@ for v in np.nditer(arr):
         i = 0
 
 f.close()
+'''
 
-plt.imsave('H:/Documents/es3f1/es3f1_camera/coursework_images/test_py.jpg', img)
+pix = img.load()
+height = img.height # 1570
+width = img.width # 2671
+
+f = open('H:/Documents/es3f1/es3f1_camera/coursework_images/in_py.txt', 'w')
+
+for i in range(width):
+    for j in range(height):
+        f.write(str(pix[i,j][0]) + " " + str(pix[i,j][1]) + " " + str(pix[i,j][2]) + "\n")
+
+f.close()
+
+
 print('DONE')
