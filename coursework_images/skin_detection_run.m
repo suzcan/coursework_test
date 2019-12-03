@@ -1,4 +1,4 @@
-fileId = fopen("H:/Documents/es3f1/es3f1_camera/coursework_images/out.txt", 'r');
+fileId = fopen('/dcs/16/u1558174/es3f1/es3f1_camera/coursework_images/in.txt'); %fopen("H:/Documents/es3f1/es3f1_camera/coursework_images/in.txt", 'r');
 
 formatSpec = '%d'; % '%d %d %d';
 sizeA = [1 Inf];
@@ -6,8 +6,8 @@ A = fscanf(fileId, formatSpec, sizeA);
 
 % group_of_people 1570x2671x3
 % face 409x615x3
-width = 615; 
-height = 409;
+width = 2671; 
+height = 1570;
 B = uint8(reshape(A, [width, height, 3]));
 
 %imshow(B);
