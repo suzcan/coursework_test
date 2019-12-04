@@ -1,4 +1,4 @@
-fileId = fopen("H:/Documents/es3f1/es3f1_camera/coursework_images/out.txt", 'r');
+fileId = fopen('/dcs/16/u1558174/es3f1/es3f1_camera/coursework_images/in.txt'); %fopen("H:/Documents/es3f1/es3f1_camera/coursework_images/in.txt", 'r');
 
 formatSpec = '%d'; % '%d %d %d';
 sizeA = [1 Inf];
